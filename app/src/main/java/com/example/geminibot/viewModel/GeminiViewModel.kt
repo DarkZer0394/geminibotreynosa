@@ -23,7 +23,7 @@ class GeminiViewModel(application: Application): AndroidViewModel(application) {
     ).build()
 
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-2.5-flash",   // Grounding con Google Search funciona en 1.5-flash
+        modelName = "gemini-3.1-flash-lite",
         apiKey = BuildConfig.apikey,
 
         // ==================== SYSTEM PROMPT (Muy Importante) ====================
@@ -34,7 +34,8 @@ class GeminiViewModel(application: Application): AndroidViewModel(application) {
             Reglas estrictas que debes seguir siempre:
             - Solo respondes sobre temas relacionados con Reynosa, Tamaulipas.
             - Nunca respondas sobre otros lugares, ciudades o temas generales.
-            - Solo respondes con texto plano (nada de imágenes, emojis excesivos ni markdown pesado).
+            - Solo respondes con texto plano.
+            - Si el usuario solicita la ubicación de un lugar en Reynosa, DEBES incluir un enlace de Google Maps correspondiente (ej. https://www.google.com/maps/search/?api=1&query=Lugar+Reynosa).
             - Sé claro, amable, preciso y útil.
             - Usa información actualizada cuando sea necesario.
             - Si la pregunta no es sobre Reynosa, responde amablemente que solo puedes ayudar con información de Reynosa.

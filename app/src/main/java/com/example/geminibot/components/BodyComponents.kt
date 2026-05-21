@@ -25,6 +25,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import com.example.geminibot.model.MessageModel
 import com.example.geminibot.ui.theme.focusColor
 import com.example.geminibot.ui.theme.unfocusedColor
@@ -62,6 +68,8 @@ fun MessageInput(onClick: (String) -> Unit) {
 @Composable
 fun GlobeMessage(messageModel: MessageModel) {
     val roleModel = messageModel.role == "model"
+    val uriHandler = LocalUriHandler.current
+
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Box(
@@ -72,9 +80,34 @@ fun GlobeMessage(messageModel: MessageModel) {
                     .padding(10.dp)
                     .clip(RoundedCornerShape(50f))
                     .background(if (roleModel) Color.Black else Color.DarkGray)
-                    .padding(8.dp)
+                    .padding(12.dp)
             ) {
-                Text(text = messageModel.message, fontWeight = FontWeight.Bold, color = Color.White)
+                val annotatedText = buildAnnotatedString {
+                    val message = messageModel.message
+                    val urlPattern = "(https?://[\\w-]+(\\.[\\w-]+)+(/\\S*)?)".toRegex()
+                    var lastIndex = 0
+                    urlPattern.findAll(message).forEach { matchResult ->
+                        append(message.substring(lastIndex, matchResult.range.first))
+                        pushStringAnnotation(tag = "URL", annotation = matchResult.value)
+                        withStyle(style = SpanStyle(color = Color.Cyan, textDecoration = TextDecoration.Underline)) {
+                            append(matchResult.value)
+                        }
+                        pop()
+                        lastIndex = matchResult.range.last + 1
+                    }
+                    append(message.substring(lastIndex))
+                }
+
+                ClickableText(
+                    text = annotatedText,
+                    style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.Bold, color = Color.White),
+                    onClick = { offset ->
+                        annotatedText.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                            .firstOrNull()?.let { annotation ->
+                                uriHandler.openUri(annotation.item)
+                            }
+                    }
+                )
             }
         }
     }

@@ -73,5 +73,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     ksp(libs.androidx.room.compiler)
+    // HTTP para Facebook API
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+
+    // JSON parsing
+    implementation("org.json:json:20251224")
+
 
 }
